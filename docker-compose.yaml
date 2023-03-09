@@ -1,0 +1,23 @@
+version: '3.9'
+services:
+  redis:
+    image: redis:alpine
+    ports: 
+      - 6379:6379
+    command: redis-server
+    environment:
+      - REDIS_REPLICATION_MODE=master
+
+  database:
+    image: mcr.microsoft.com/mssql/server
+    ports: 
+      - 1433:1433
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: example_123    
+    healthcheck:
+        test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P example_123 -Q 'SELECT 1' || exit 1"]
+        interval: 10s
+        retries: 10
+        start_period: 10s
+        timeout: 3s
